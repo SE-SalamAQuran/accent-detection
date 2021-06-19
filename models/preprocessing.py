@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import noisereduce as nr
 import librosa, librosa.display
 import os
+import math
 
 warnings.filterwarnings('ignore')
 #
@@ -42,34 +43,36 @@ class Preprocessor():
 #Feature Extraction
 
 #Step1: Zero-Crosssing Rate
-    def z_cross_rate(data, n0, n1):
+    def z_cross_rate(self, data, n0, n1):
         #Should return zero crossings found in the audio signal between n0, n1
         return librosa.zero_crossings(data[n0:n1], pad=False)
 
 #Step2: Spectral roll-off
 
-    def roll_off(data, samp_rate):
-    # Approximate maximum frequencies with roll_percent=0.85 (default)
-        rolloff = librosa.feature.spectral_rolloff(y=data, sr=samp_rate)
+    def roll_off(self, data, samp_rate):
+        # Approximate minimum frequencies with roll_percent=0.1
 
-# Approximate minimum frequencies with roll_percent=0.1
-        rolloff = librosa.feature.spectral_rolloff(y=data, sr=samp_rate, roll_percent=0.1)
-        return rolloff
+        return librosa.feature.spectral_rolloff(y=data, sr=samp_rate, roll_percent=0.1)
+
+
 
 #Step3: MFCC (Mel-frequency cepstral coefficients)
-    def Mfcc(data, samp_rate):
+    def Mfcc(self, data, samp_rate):
         return librosa.feature.mfcc(data, sr=samp_rate)
 
 #Step4: Chroma Frequencies
-    def chroma_freq(data, samp_rate, hop_length = 512):
+    def chroma_freq(self, data, samp_rate, hop_length = 512):
     # returns normalized energy for each chroma bin at each frame.
         return librosa.feature.chroma_stft(data, sr=samp_rate, hop_length=hop_length)
 
 
-    def plot_signal(title, x_label, y_label, data):
+    def plot_signal(self, title, x_label, y_label, data):
         plt.figure()
         plt.plot(data)
         plt.xlabel(x_label)
         plt.ylabel(y_label)
         plt.title(title)
         plt.show()
+
+    def logPow(self, data):
+        return [math.log(math.pow(x,2)) for x in data]
